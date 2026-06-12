@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/tesserine/agent-protocols/main/schemas/protocol.schema.json",
+  "title": "Agent Protocols canonical model",
+  "description": "Validates the parsed YAML frontmatter of a protocol's canonical-model document. Shape only; the structural rules V1-V12 of spec/canonical-model.md are checked by the reference validator.",
+  "type": "object",
+  "required": ["name", "description", "protocol"],
+  "properties": {
+    "name": {
+      "$ref": "#/$defs/slug"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "protocol": {
+      "type": "object",
+      "required": ["spec", "intent", "contract", "steps"],
+      "properties": {
+        "spec": {
+          "const": "1"
+        },
+        "intent": {
+          "$ref": "#/$defs/oneLine"
+        },
+        "contract": {
+          "type": "object",
+          "required": ["precondition", "postcondition"],
+          "properties": {
+            "precondition": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "$ref": "#/$defs/slug" },
+                  {
+                    "type": "object",
+                    "required": ["ref", "optional"],
+                    "properties": {
+                      "ref": { "$ref": "#/$defs/slug" },
+                      "optional": { "const": true }
+                    },
+                    "patternProperties": { "^x-": true },
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "postcondition": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  { "$ref": "#/$defs/slug" },
+                  {
+                    "type": "object",
+                    "required": ["group", "one_of"],
+                    "properties": {
+                      "group": { "$ref": "#/$defs/slug" },
+                      "one_of": {
+                        "type": "array",
+                        "minItems": 2,
+                        "items": { "$ref": "#/$defs/slug" }
+                      }
+                    },
+                    "patternProperties": { "^x-": true },
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          },
+          "patternProperties": { "^x-": true },
+          "additionalProperties": false
+        },
+        "invariants": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "rule"],
+            "properties": {
+              "id": { "$ref": "#/$defs/slug" },
+              "rule": { "$ref": "#/$defs/oneSentence" }
+            },
+            "patternProperties": { "^x-": true },
+            "additionalProperties": false
+          }
+        },
+        "corruption_modes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "signal"],
+            "properties": {
+              "id": { "$ref": "#/$defs/slug" },
+              "signal": { "$ref": "#/$defs/oneSentence" }
+            },
+            "patternProperties": { "^x-": true },
+            "additionalProperties": false
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/step" }
+        }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    }
+  },
+  "patternProperties": { "^x-": true },
+  "additionalProperties": false,
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "oneLine": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140
+    },
+    "oneSentence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "step": {
+      "oneOf": [
+        { "$ref": "#/$defs/leafStep" },
+        { "$ref": "#/$defs/compositeStep" }
+      ]
+    },
+    "leafStep": {
+      "type": "object",
+      "required": ["id", "title", "intent"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "intent": { "$ref": "#/$defs/oneLine" },
+        "needs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/needEntry" }
+        },
+        "yields": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/slug" }
+        },
+        "outcomes": {
+          "type": "object",
+          "required": ["group", "one_of"],
+          "properties": {
+            "group": { "$ref": "#/$defs/slug" },
+            "one_of": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["id", "when", "yields"],
+                "properties": {
+                  "id": { "$ref": "#/$defs/slug" },
+                  "when": { "$ref": "#/$defs/oneLine" },
+                  "yields": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "$ref": "#/$defs/slug" }
+                  }
+                },
+                "patternProperties": { "^x-": true },
+                "additionalProperties": false
+              }
+            }
+          },
+          "patternProperties": { "^x-": true },
+          "additionalProperties": false
+        },
+        "applies": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/slug" }
+        }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "compositeStep": {
+      "type": "object",
+      "required": ["id", "title", "intent", "steps"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "intent": { "$ref": "#/$defs/oneLine" },
+        "steps": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/step" }
+        }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "needEntry": {
+      "oneOf": [
+        { "$ref": "#/$defs/slug" },
+        {
+          "type": "object",
+          "required": ["ref", "optional"],
+          "properties": {
+            "ref": { "$ref": "#/$defs/slug" },
+            "optional": { "const": true }
+          },
+          "patternProperties": { "^x-": true },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ref", "feedback"],
+          "properties": {
+            "ref": { "$ref": "#/$defs/slug" },
+            "feedback": { "const": true },
+            "when": { "$ref": "#/$defs/oneLine" }
+          },
+          "patternProperties": { "^x-": true },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["any_of"],
+          "properties": {
+            "any_of": {
+              "type": "array",
+              "minItems": 2,
+              "items": { "$ref": "#/$defs/slug" }
+            }
+          },
+          "patternProperties": { "^x-": true },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
