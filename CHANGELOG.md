@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This file is the single home of the standard's version; specification
 documents carry a status, never a version number.
 
+## [Unreleased]
+
+### Added
+
+- README sections "How It Fits Into Tesserine" and "Status": where the
+  standard sits relative to the runa runtime and the groundwork
+  methodology, and the explicit claim levels — draft spec and binding,
+  implemented tooling, recorded binding gaps, design-only TUI.
+
 ## [0.1.0] - 2026-06-12
 
 Initial draft of the standard.
