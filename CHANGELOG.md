@@ -29,3 +29,6 @@ Initial draft of the standard.
 - Reference tooling: instance validation and view projection
   (`tools/validate.py`, `tools/project.py`, `tools/check.sh`).
 - Design for the authoring/visualization TUI (`design/tui.md`).
+- Repository README: the entry point routing readers, authors, and
+  implementers into the standard, with a worked excerpt and its derived view
+  (`README.md`).
