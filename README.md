@@ -110,6 +110,41 @@ stateDiagram-v2
   review_disposition --> [*] : At least one blocking finding remains. — produces change-needs-revision
 ```
 
+## How It Fits Into Tesserine
+
+The standard core is runtime-agnostic — `spec/` names no runtime, and the
+[convergence harness](tools/check.sh) keeps it that way mechanically — but
+the standard grew inside the [Tesserine](https://github.com/tesserine)
+ecosystem, which is its reference implementation. There,
+[groundwork](https://github.com/tesserine/groundwork) is the methodology
+that authors protocols and [runa](https://github.com/tesserine/runa) is the
+runtime that enforces their contracts.
+[`bindings/tesserine.md`](bindings/tesserine.md) records the mapping —
+preconditions and postconditions onto the manifest declarations runa fails
+loudly, dispositions onto required-output choices, delegation onto skills in
+the [Agent Skills](https://agentskills.io) envelope — and names the gaps the
+binding has not yet closed rather than papering over them.
+
+The worked examples are not demonstrations invented for this README:
+`review` and `verify` are real groundwork protocols whose prose and workflow
+graphs had drifted apart in their original two-file form.
+[`examples/README.md`](examples/README.md) records what the drift looked
+like and what one canonical home recovered.
+
+## Status
+
+- The three `spec/` documents and the Tesserine binding are a **draft**;
+  the version's single home is the [changelog](CHANGELOG.md).
+- The schema, validator, view projector, and convergence harness are
+  **implemented** and runnable today (see [Tooling](#tooling)).
+- Two binding gaps are **open and recorded** in
+  [`bindings/tesserine.md`](bindings/tesserine.md): invariants are stated in
+  canonical models but not yet mechanically enforced by the runtime, and the
+  runtime manifest is still authored by hand — held convergent with the
+  canonical models by a check, not yet generated from them.
+- The protocol workbench TUI is **designed, not built**:
+  [`design/tui.md`](design/tui.md) specifies it; no code exists yet.
+
 ## Repository Map
 
 | Path | What it is |
@@ -121,7 +156,7 @@ stateDiagram-v2
 | [`bindings/tesserine.md`](bindings/tesserine.md) | The reference implementation's binding: how the standard maps onto the `runa` runtime and the `groundwork` methodology. |
 | [`examples/`](examples/README.md) | Two protocols from the groundwork methodology, `review` and `verify`, expressed in the canonical model, with derived views beside them. |
 | [`tools/`](tools/) | Reference tooling: instance validator, view projector, convergence harness. |
-| [`design/tui.md`](design/tui.md) | Design for the protocol workbench, a TUI for authoring and visualizing canonical models. |
+| [`design/tui.md`](design/tui.md) | Design for the protocol workbench, a TUI for authoring and visualizing canonical models. Design only — nothing is built yet. |
 | [`CHANGELOG.md`](CHANGELOG.md) | The record of notable changes and the single home of the standard's version number. |
 
 ## Where to Start
